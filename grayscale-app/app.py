@@ -1,5 +1,5 @@
 from PIL import Image, ImageOps
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, Producer
 import json
 import os
 from time import sleep
@@ -20,6 +20,12 @@ def create_grayscale(path_file):
 
     name, ext = os.path.splitext(filename)
     gray_image.save(output_folder + name + NEW + ext)
+
+
+producer = Producer({
+    'bootstrap.servers': 'kafka1:19091,kafka2:19092,kafka3:19093',
+    'client.id': 'grayscale-producer'
+})
 
 #sleep(30)
 ### Consumer
@@ -46,6 +52,9 @@ try:
             logging.warning(f"READING {filename}")
             create_grayscale(IN_FOLDER + filename)
             logging.warning (f"ENDING {filename}")
+
+            
+
         elif msg.error().code() == KafkaError._PARTITION_EOF:
             logging.warning('End of partition reached {0}/{1}'
                   .format(msg.topic(), msg.partition()))
