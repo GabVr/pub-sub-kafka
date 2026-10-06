@@ -10,7 +10,7 @@ services:
       - kafka1
 
   notificacao:
-    build: ./notificacao-app
+    build: notificacao-app
     container_name: notificacao
     volumes:
       - ./appdata:/appdata
@@ -22,7 +22,7 @@ services:
       - default
 
   text:
-    build: ./text-app
+    build: text-app
     container_name: text
     volumes:
       - ./appdata:/appdata

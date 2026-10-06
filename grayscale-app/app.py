@@ -4,6 +4,13 @@ import json
 import os
 from time import sleep
 import logging
+from notificacao_app.app import envioEmail
+from PIL import Image, ImageOps
+
+REMETENTE = "gabrielverissimo735@gmail.com"
+DESTINATARIO = "your@gmail.com"  # Coloque o e-mail de destino
+SENHA_APP = "sua_senha_de_app_aqui"
+
 OUT_FOLDER = '/processed/grayscale/'
 NEW = '_grayscale'
 IN_FOLDER = "/appdata/static/uploads/"
@@ -53,6 +60,7 @@ try:
             create_grayscale(IN_FOLDER + filename)
             logging.warning (f"ENDING {filename}")
 
+            envioEmail(REMETENTE, DESTINATARIO, SENHA_APP, filename)
             
 
         elif msg.error().code() == KafkaError._PARTITION_EOF:

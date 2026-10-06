@@ -6,25 +6,28 @@ import ssl
 import json
 import smtplib
 
-remetente = "my@gmail.com"
-destinatario = "your@gmail.com"
-senha_app = ""
+remetente = "gabrielverissimo735@gmail.com"
+destinatario = "your@gmail.com" #É necessário botar o email do destinatário
+senha_app = "" #Aqui vai ficar a senha do app, a senha do app vai ficar relacionada ao email utilizado, nesse caso, eu apenas coloquei o meu de exemplo para testes
 
-def envioEmail(remetente, senha_app):
+def envioEmail(remetente, destinatario, senha_app, dados):
    msg = EmailMessage()
    msg["to"] = destinatario
    msg["from"] = remetente
    msg["subject"] = "Chegou o email"
    msg.set_content("Este é uma mensagem de verificação")
 
-   send(msg, remetente)
+    
+   msg.set_content(
+        f"Este é um e-mail de verificação.\n\nDados recebidos: {dados}"
+    )
 
    contexto = ssl.create_default_context()
 
    try:
        with smtplib.SMTP('smtp.gmail.com', 587) as servidor_email:
         servidor_email.starttls(context=contexto)
-        servidor_email.login(remetente, 'sua_senha_de_app')
+        servidor_email.login(remetente, senha_app)
         servidor_email.send_message(msg)
         print('Email enviado com sucesso!')
    except smtplib.SMTPAuthenticationError:
@@ -54,7 +57,7 @@ try:
         elif not msg.error():
             dados = json.loads(msg.value())
             print(f"Recebido aviso do Kafka: {dados}")
-            envioEmail(remetente, senha_app)
+            envioEmail(remetente, destinatario, senha_app, dados)
         elif msg.error().code() == KafkaError._PARTITION_EOF:
             pass 
         else:

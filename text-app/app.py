@@ -2,6 +2,8 @@ from PIL import Image, ImageDraw
 from confluent_kafka import Consumer, KafkaError
 import os
 from time import sleep
+import json
+import logging
 
 OUT_FOLDER = '/processed/text/'
 NEW = '_text'
@@ -38,3 +40,28 @@ c = Consumer({
 })
 
 c.subscribe(['image'])
+
+try:
+    while True:
+        msg = c.poll(0.1)
+        if msg is None:
+            continue
+        elif not msg.error():
+            data = json.loads(msg.value())
+            filename = data['new_file']
+            logging.warning(f"READING {filename}")
+            criarText(IN_FOLDER + filename)
+            logging.warning (f"ENDING {filename}")
+
+            
+
+        elif msg.error().code() == KafkaError._PARTITION_EOF:
+            logging.warning('End of partition reached {0}/{1}'
+                  .format(msg.topic(), msg.partition()))
+        else:
+            logging.error('Error occured: {0}'.format(msg.error().str()))
+
+except KeyboardInterrupt:
+    pass
+finally:
+    c.close()
